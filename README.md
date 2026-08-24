@@ -15,9 +15,10 @@ On macOS, install SDL2 and SDL2_ttf via Homebrew:
 brew install sdl2 sdl2_ttf
 ```
 
-On-screen text (control hints, game-over message) is rendered with the
-system Monaco font (`/System/Library/Fonts/Monaco.ttf`), so this currently
-assumes macOS.
+On-screen text (control hints, game-over message) is rendered with a
+system font, found automatically at startup from a list of common paths
+on macOS, Linux, and Windows. If none of those paths exist, the game
+still runs, just without that text.
 
 ## Build
 

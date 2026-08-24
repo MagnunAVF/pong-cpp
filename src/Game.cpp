@@ -30,9 +30,30 @@ constexpr float kDashWidth = 4.0f;
 constexpr float kDashHeight = 16.0f;
 constexpr float kDashGap = 12.0f;
 
-constexpr const char* kFontPath = "/System/Library/Fonts/Monaco.ttf";
+// Tried in order; the first path that exists on this OS is used. Covers
+// macOS, common Linux distros, and Windows without bundling a font file
+// (system fonts generally aren't redistributable).
+constexpr const char* kFontPathCandidates[] = {
+    "/System/Library/Fonts/Monaco.ttf",
+    "/System/Library/Fonts/Supplemental/Arial.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+    "/usr/share/fonts/liberation-sans/LiberationSans-Regular.ttf",
+    "C:\\Windows\\Fonts\\consola.ttf",
+    "C:\\Windows\\Fonts\\arial.ttf",
+};
 constexpr int kFontSize = 16;
 constexpr float kHintMarginBottom = 40.0f;
+
+TTF_Font* OpenFirstAvailableFont(int size) {
+    for (const char* path : kFontPathCandidates) {
+        TTF_Font* font = TTF_OpenFont(path, size);
+        if (font != nullptr) {
+            return font;
+        }
+    }
+    return nullptr;
+}
 
 // Segment order: a (top), b (top-right), c (bottom-right), d (bottom),
 // e (bottom-left), f (top-left), g (middle).
@@ -167,9 +188,12 @@ bool Game::Init() {
     if (TTF_Init() != 0) {
         std::fprintf(stderr, "TTF_Init failed: %s\n", TTF_GetError());
     } else {
-        font_ = TTF_OpenFont(kFontPath, kFontSize);
+        font_ = OpenFirstAvailableFont(kFontSize);
         if (font_ == nullptr) {
-            std::fprintf(stderr, "TTF_OpenFont failed: %s\n", TTF_GetError());
+            std::fprintf(stderr,
+                          "No system font found; on-screen text will be "
+                          "skipped: %s\n",
+                          TTF_GetError());
         } else {
             left_hint_texture_ =
                 CreateTextTexture(renderer_, font_, "W/S: MOVE");
