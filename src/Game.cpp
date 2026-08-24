@@ -16,6 +16,65 @@ constexpr float kPaddleSpeed = 300.0f;
 
 constexpr float kBallSize = 12.0f;
 constexpr float kBallSpeed = 250.0f;
+
+constexpr float kDigitWidth = 20.0f;
+constexpr float kDigitHeight = 30.0f;
+constexpr float kDigitThickness = 4.0f;
+constexpr float kDigitSpacing = 10.0f;
+constexpr float kScoreMarginTop = 20.0f;
+constexpr float kScoreMarginCenter = 40.0f;
+
+// Segment order: a (top), b (top-right), c (bottom-right), d (bottom),
+// e (bottom-left), f (top-left), g (middle).
+constexpr bool kDigitSegments[10][7] = {
+    {true, true, true, true, true, true, false},      // 0
+    {false, true, true, false, false, false, false},  // 1
+    {true, true, false, true, true, false, true},      // 2
+    {true, true, true, true, false, false, true},      // 3
+    {false, true, true, false, false, true, true},     // 4
+    {true, false, true, true, false, true, true},      // 5
+    {true, false, true, true, true, true, true},       // 6
+    {true, true, true, false, false, false, false},    // 7
+    {true, true, true, true, true, true, true},        // 8
+    {true, true, true, true, false, true, true},       // 9
+};
+
+void DrawDigit(SDL_Renderer* renderer, int digit, float x, float y) {
+    if (digit < 0 || digit > 9) {
+        return;
+    }
+
+    const bool* segments = kDigitSegments[digit];
+    const float half_h = kDigitHeight / 2.0f;
+
+    const SDL_FRect rects[7] = {
+        {x, y, kDigitWidth, kDigitThickness},
+        {x + kDigitWidth - kDigitThickness, y, kDigitThickness, half_h},
+        {x + kDigitWidth - kDigitThickness, y + half_h, kDigitThickness, half_h},
+        {x, y + kDigitHeight - kDigitThickness, kDigitWidth, kDigitThickness},
+        {x, y + half_h, kDigitThickness, half_h},
+        {x, y, kDigitThickness, half_h},
+        {x, y + half_h - kDigitThickness / 2.0f, kDigitWidth, kDigitThickness},
+    };
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    for (int i = 0; i < 7; ++i) {
+        if (segments[i]) {
+            SDL_RenderFillRectF(renderer, &rects[i]);
+        }
+    }
+}
+
+void DrawNumber(SDL_Renderer* renderer, int number, float x, float y) {
+    char buffer[12];
+    std::snprintf(buffer, sizeof(buffer), "%d", number);
+
+    float cursor_x = x;
+    for (const char* c = buffer; *c != '\0'; ++c) {
+        DrawDigit(renderer, *c - '0', cursor_x, y);
+        cursor_x += kDigitWidth + kDigitSpacing;
+    }
+}
 }  // namespace
 
 bool Game::Init() {
@@ -157,6 +216,12 @@ void Game::Render() {
     left_paddle_->Render(renderer_);
     right_paddle_->Render(renderer_);
     ball_->Render(renderer_);
+
+    DrawNumber(renderer_, left_score_,
+               kWindowWidth / 2.0f - kScoreMarginCenter - kDigitWidth,
+               kScoreMarginTop);
+    DrawNumber(renderer_, right_score_,
+               kWindowWidth / 2.0f + kScoreMarginCenter, kScoreMarginTop);
 
     SDL_RenderPresent(renderer_);
 }
