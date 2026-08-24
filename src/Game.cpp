@@ -87,6 +87,26 @@ void Game::ProcessInput() {
             running_ = false;
         }
     }
+
+    const Uint8* keys = SDL_GetKeyboardState(nullptr);
+
+    float left_velocity = 0.0f;
+    if (keys[SDL_SCANCODE_W]) {
+        left_velocity -= left_paddle_->speed();
+    }
+    if (keys[SDL_SCANCODE_S]) {
+        left_velocity += left_paddle_->speed();
+    }
+    left_paddle_->SetVelocityY(left_velocity);
+
+    float right_velocity = 0.0f;
+    if (keys[SDL_SCANCODE_UP]) {
+        right_velocity -= right_paddle_->speed();
+    }
+    if (keys[SDL_SCANCODE_DOWN]) {
+        right_velocity += right_paddle_->speed();
+    }
+    right_paddle_->SetVelocityY(right_velocity);
 }
 
 void Game::Update(float dt) {
