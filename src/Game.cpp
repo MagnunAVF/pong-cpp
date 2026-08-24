@@ -11,6 +11,9 @@ constexpr float kPaddleWidth = 12.0f;
 constexpr float kPaddleHeight = 80.0f;
 constexpr float kPaddleMargin = 30.0f;
 constexpr float kPaddleSpeed = 300.0f;
+
+constexpr float kBallSize = 12.0f;
+constexpr float kBallSpeed = 250.0f;
 }  // namespace
 
 bool Game::Init() {
@@ -44,6 +47,10 @@ bool Game::Init() {
                                 paddle_y, kPaddleWidth, kPaddleHeight,
                                 kPaddleSpeed);
 
+    ball_ = new Ball((kWindowWidth - kBallSize) / 2.0f,
+                      (kWindowHeight - kBallSize) / 2.0f, kBallSize,
+                      kBallSpeed, kBallSpeed * 0.6f);
+
     running_ = true;
     return true;
 }
@@ -75,6 +82,7 @@ void Game::Run() {
 void Game::Shutdown() {
     delete left_paddle_;
     delete right_paddle_;
+    delete ball_;
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
     SDL_Quit();
@@ -112,6 +120,7 @@ void Game::ProcessInput() {
 void Game::Update(float dt) {
     left_paddle_->Update(dt, kWindowHeight);
     right_paddle_->Update(dt, kWindowHeight);
+    ball_->Update(dt);
 }
 
 void Game::Render() {
@@ -120,6 +129,7 @@ void Game::Render() {
 
     left_paddle_->Render(renderer_);
     right_paddle_->Render(renderer_);
+    ball_->Render(renderer_);
 
     SDL_RenderPresent(renderer_);
 }

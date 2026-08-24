@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 
+#include "Ball.h"
 #include "Paddle.h"
 
 class Game {
@@ -19,5 +20,6 @@ private:
     SDL_Renderer* renderer_ = nullptr;
     Paddle* left_paddle_ = nullptr;
     Paddle* right_paddle_ = nullptr;
+    Ball* ball_ = nullptr;
     bool running_ = false;
 };
