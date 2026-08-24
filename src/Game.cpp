@@ -30,6 +30,10 @@ constexpr float kDashWidth = 4.0f;
 constexpr float kDashHeight = 16.0f;
 constexpr float kDashGap = 12.0f;
 
+constexpr const char* kFontPath = "/System/Library/Fonts/Monaco.ttf";
+constexpr int kFontSize = 16;
+constexpr float kHintMarginBottom = 40.0f;
+
 // Segment order: a (top), b (top-right), c (bottom-right), d (bottom),
 // e (bottom-left), f (top-left), g (middle).
 constexpr bool kDigitSegments[10][7] = {
@@ -91,6 +95,36 @@ void DrawCenterLine(SDL_Renderer* renderer) {
         SDL_RenderFillRectF(renderer, &dash);
     }
 }
+
+SDL_Texture* CreateTextTexture(SDL_Renderer* renderer, TTF_Font* font,
+                                const char* text) {
+    const SDL_Color white{255, 255, 255, 255};
+    SDL_Surface* surface = TTF_RenderText_Blended(font, text, white);
+    if (surface == nullptr) {
+        std::fprintf(stderr, "TTF_RenderText_Blended failed: %s\n",
+                     TTF_GetError());
+        return nullptr;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    return texture;
+}
+
+void DrawTextureCentered(SDL_Renderer* renderer, SDL_Texture* texture,
+                          float center_x, float y) {
+    if (texture == nullptr) {
+        return;
+    }
+
+    int width = 0;
+    int height = 0;
+    SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
+
+    const SDL_FRect dst{center_x - width / 2.0f, y,
+                         static_cast<float>(width), static_cast<float>(height)};
+    SDL_RenderCopyF(renderer, texture, nullptr, &dst);
+}
 }  // namespace
 
 bool Game::Init() {
@@ -130,6 +164,22 @@ bool Game::Init() {
                       (kWindowHeight - kBallSize) / 2.0f, kBallSize,
                       kBallSpeed, kBallSpeed * 0.6f);
 
+    if (TTF_Init() != 0) {
+        std::fprintf(stderr, "TTF_Init failed: %s\n", TTF_GetError());
+    } else {
+        font_ = TTF_OpenFont(kFontPath, kFontSize);
+        if (font_ == nullptr) {
+            std::fprintf(stderr, "TTF_OpenFont failed: %s\n", TTF_GetError());
+        } else {
+            left_hint_texture_ =
+                CreateTextTexture(renderer_, font_, "W/S: MOVE");
+            right_hint_texture_ =
+                CreateTextTexture(renderer_, font_, "UP/DOWN: MOVE");
+            game_over_texture_ = CreateTextTexture(
+                renderer_, font_, "GAME OVER - PRESS ENTER TO RESTART");
+        }
+    }
+
     running_ = true;
     return true;
 }
@@ -162,6 +212,15 @@ void Game::Shutdown() {
     delete left_paddle_;
     delete right_paddle_;
     delete ball_;
+
+    SDL_DestroyTexture(left_hint_texture_);
+    SDL_DestroyTexture(right_hint_texture_);
+    SDL_DestroyTexture(game_over_texture_);
+    if (font_ != nullptr) {
+        TTF_CloseFont(font_);
+    }
+    TTF_Quit();
+
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
     SDL_Quit();
@@ -269,6 +328,17 @@ void Game::Render() {
                kScoreMarginTop);
     DrawNumber(renderer_, right_score_,
                kWindowWidth / 2.0f + kScoreMarginCenter, kScoreMarginTop);
+
+    DrawTextureCentered(renderer_, left_hint_texture_, kWindowWidth / 4.0f,
+                         kWindowHeight - kHintMarginBottom);
+    DrawTextureCentered(renderer_, right_hint_texture_,
+                         3.0f * kWindowWidth / 4.0f,
+                         kWindowHeight - kHintMarginBottom);
+
+    if (state_ == GameState::GameOver) {
+        DrawTextureCentered(renderer_, game_over_texture_,
+                             kWindowWidth / 2.0f, kWindowHeight / 2.0f);
+    }
 
     SDL_RenderPresent(renderer_);
 }
