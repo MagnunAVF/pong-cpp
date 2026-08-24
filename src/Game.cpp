@@ -6,6 +6,11 @@ namespace {
 constexpr int kWindowWidth = 800;
 constexpr int kWindowHeight = 600;
 constexpr float kFixedTimestep = 1.0f / 60.0f;
+
+constexpr float kPaddleWidth = 12.0f;
+constexpr float kPaddleHeight = 80.0f;
+constexpr float kPaddleMargin = 30.0f;
+constexpr float kPaddleSpeed = 300.0f;
 }  // namespace
 
 bool Game::Init() {
@@ -31,6 +36,13 @@ bool Game::Init() {
         SDL_Quit();
         return false;
     }
+
+    const float paddle_y = (kWindowHeight - kPaddleHeight) / 2.0f;
+    left_paddle_ = new Paddle(kPaddleMargin, paddle_y, kPaddleWidth,
+                               kPaddleHeight, kPaddleSpeed);
+    right_paddle_ = new Paddle(kWindowWidth - kPaddleMargin - kPaddleWidth,
+                                paddle_y, kPaddleWidth, kPaddleHeight,
+                                kPaddleSpeed);
 
     running_ = true;
     return true;
@@ -61,6 +73,8 @@ void Game::Run() {
 }
 
 void Game::Shutdown() {
+    delete left_paddle_;
+    delete right_paddle_;
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
     SDL_Quit();
@@ -76,11 +90,16 @@ void Game::ProcessInput() {
 }
 
 void Game::Update(float dt) {
-    (void)dt;
+    left_paddle_->Update(dt, kWindowHeight);
+    right_paddle_->Update(dt, kWindowHeight);
 }
 
 void Game::Render() {
     SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
     SDL_RenderClear(renderer_);
+
+    left_paddle_->Render(renderer_);
+    right_paddle_->Render(renderer_);
+
     SDL_RenderPresent(renderer_);
 }
