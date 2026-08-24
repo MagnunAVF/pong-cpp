@@ -5,6 +5,11 @@
 #include "Ball.h"
 #include "Paddle.h"
 
+enum class GameState {
+    Playing,
+    GameOver,
+};
+
 class Game {
 public:
     bool Init();
@@ -17,6 +22,7 @@ private:
     void Render();
 
     void ResetBall();
+    void RestartGame();
 
     SDL_Window* window_ = nullptr;
     SDL_Renderer* renderer_ = nullptr;
@@ -25,5 +31,6 @@ private:
     Ball* ball_ = nullptr;
     int left_score_ = 0;
     int right_score_ = 0;
+    GameState state_ = GameState::Playing;
     bool running_ = false;
 };

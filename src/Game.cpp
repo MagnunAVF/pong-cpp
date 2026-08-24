@@ -17,6 +17,8 @@ constexpr float kPaddleSpeed = 300.0f;
 constexpr float kBallSize = 12.0f;
 constexpr float kBallSpeed = 250.0f;
 
+constexpr int kWinningScore = 5;
+
 constexpr float kDigitWidth = 20.0f;
 constexpr float kDigitHeight = 30.0f;
 constexpr float kDigitThickness = 4.0f;
@@ -156,7 +158,15 @@ void Game::ProcessInput() {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             running_ = false;
+        } else if (event.type == SDL_KEYDOWN &&
+                   event.key.keysym.scancode == SDL_SCANCODE_RETURN &&
+                   state_ == GameState::GameOver) {
+            RestartGame();
         }
+    }
+
+    if (state_ != GameState::Playing) {
+        return;
     }
 
     const Uint8* keys = SDL_GetKeyboardState(nullptr);
@@ -181,6 +191,10 @@ void Game::ProcessInput() {
 }
 
 void Game::Update(float dt) {
+    if (state_ != GameState::Playing) {
+        return;
+    }
+
     left_paddle_->Update(dt, kWindowHeight);
     right_paddle_->Update(dt, kWindowHeight);
     ball_->Update(dt, kWindowHeight);
@@ -202,11 +216,28 @@ void Game::Update(float dt) {
         std::printf("Score: %d - %d\n", left_score_, right_score_);
         ResetBall();
     }
+
+    if (left_score_ >= kWinningScore || right_score_ >= kWinningScore) {
+        state_ = GameState::GameOver;
+        std::printf("Game over! Press Enter to restart.\n");
+    }
 }
 
 void Game::ResetBall() {
     ball_->Reset((kWindowWidth - kBallSize) / 2.0f,
                  (kWindowHeight - kBallSize) / 2.0f, kBallSpeed);
+}
+
+void Game::RestartGame() {
+    left_score_ = 0;
+    right_score_ = 0;
+
+    const float paddle_y = (kWindowHeight - kPaddleHeight) / 2.0f;
+    left_paddle_->SetY(paddle_y);
+    right_paddle_->SetY(paddle_y);
+
+    ResetBall();
+    state_ = GameState::Playing;
 }
 
 void Game::Render() {

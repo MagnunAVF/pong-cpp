@@ -7,6 +7,10 @@ void Paddle::SetVelocityY(float velocity_y) {
     velocity_y_ = velocity_y;
 }
 
+void Paddle::SetY(float y) {
+    rect_.y = y;
+}
+
 void Paddle::Update(float dt, int window_height) {
     rect_.y += velocity_y_ * dt;
 
