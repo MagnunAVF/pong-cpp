@@ -26,6 +26,10 @@ constexpr float kDigitSpacing = 10.0f;
 constexpr float kScoreMarginTop = 20.0f;
 constexpr float kScoreMarginCenter = 40.0f;
 
+constexpr float kDashWidth = 4.0f;
+constexpr float kDashHeight = 16.0f;
+constexpr float kDashGap = 12.0f;
+
 // Segment order: a (top), b (top-right), c (bottom-right), d (bottom),
 // e (bottom-left), f (top-left), g (middle).
 constexpr bool kDigitSegments[10][7] = {
@@ -75,6 +79,16 @@ void DrawNumber(SDL_Renderer* renderer, int number, float x, float y) {
     for (const char* c = buffer; *c != '\0'; ++c) {
         DrawDigit(renderer, *c - '0', cursor_x, y);
         cursor_x += kDigitWidth + kDigitSpacing;
+    }
+}
+
+void DrawCenterLine(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    const float x = (kWindowWidth - kDashWidth) / 2.0f;
+    for (float y = 0.0f; y < kWindowHeight; y += kDashHeight + kDashGap) {
+        const SDL_FRect dash{x, y, kDashWidth, kDashHeight};
+        SDL_RenderFillRectF(renderer, &dash);
     }
 }
 }  // namespace
@@ -243,6 +257,8 @@ void Game::RestartGame() {
 void Game::Render() {
     SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
     SDL_RenderClear(renderer_);
+
+    DrawCenterLine(renderer_);
 
     left_paddle_->Render(renderer_);
     right_paddle_->Render(renderer_);
