@@ -8,6 +8,7 @@
 
 enum class GameState {
     Playing,
+    Paused,
     GameOver,
 };
 
@@ -34,6 +35,7 @@ private:
     SDL_Texture* left_hint_texture_ = nullptr;
     SDL_Texture* right_hint_texture_ = nullptr;
     SDL_Texture* game_over_texture_ = nullptr;
+    SDL_Texture* paused_texture_ = nullptr;
     int left_score_ = 0;
     int right_score_ = 0;
     GameState state_ = GameState::Playing;

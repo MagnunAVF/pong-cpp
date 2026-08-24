@@ -201,6 +201,8 @@ bool Game::Init() {
                 CreateTextTexture(renderer_, font_, "UP/DOWN: MOVE");
             game_over_texture_ = CreateTextTexture(
                 renderer_, font_, "GAME OVER - PRESS ENTER TO RESTART");
+            paused_texture_ =
+                CreateTextTexture(renderer_, font_, "PAUSED - PRESS P TO RESUME");
         }
     }
 
@@ -240,6 +242,7 @@ void Game::Shutdown() {
     SDL_DestroyTexture(left_hint_texture_);
     SDL_DestroyTexture(right_hint_texture_);
     SDL_DestroyTexture(game_over_texture_);
+    SDL_DestroyTexture(paused_texture_);
     if (font_ != nullptr) {
         TTF_CloseFont(font_);
     }
@@ -259,6 +262,13 @@ void Game::ProcessInput() {
                    event.key.keysym.scancode == SDL_SCANCODE_RETURN &&
                    state_ == GameState::GameOver) {
             RestartGame();
+        } else if (event.type == SDL_KEYDOWN &&
+                   event.key.keysym.scancode == SDL_SCANCODE_P) {
+            if (state_ == GameState::Playing) {
+                state_ = GameState::Paused;
+            } else if (state_ == GameState::Paused) {
+                state_ = GameState::Playing;
+            }
         }
     }
 
@@ -362,6 +372,9 @@ void Game::Render() {
     if (state_ == GameState::GameOver) {
         DrawTextureCentered(renderer_, game_over_texture_,
                              kWindowWidth / 2.0f, kWindowHeight / 2.0f);
+    } else if (state_ == GameState::Paused) {
+        DrawTextureCentered(renderer_, paused_texture_, kWindowWidth / 2.0f,
+                             kWindowHeight / 2.0f);
     }
 
     SDL_RenderPresent(renderer_);
