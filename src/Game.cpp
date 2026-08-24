@@ -259,6 +259,9 @@ void Game::ProcessInput() {
         if (event.type == SDL_QUIT) {
             running_ = false;
         } else if (event.type == SDL_KEYDOWN &&
+                   event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+            running_ = false;
+        } else if (event.type == SDL_KEYDOWN &&
                    event.key.keysym.scancode == SDL_SCANCODE_RETURN &&
                    state_ == GameState::GameOver) {
             RestartGame();
