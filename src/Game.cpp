@@ -121,6 +121,14 @@ void Game::Update(float dt) {
     left_paddle_->Update(dt, kWindowHeight);
     right_paddle_->Update(dt, kWindowHeight);
     ball_->Update(dt, kWindowHeight);
+
+    if (ball_->velocity_x() < 0.0f &&
+        SDL_HasIntersectionF(&ball_->rect(), &left_paddle_->rect())) {
+        ball_->BounceOffPaddle(left_paddle_->rect());
+    } else if (ball_->velocity_x() > 0.0f &&
+               SDL_HasIntersectionF(&ball_->rect(), &right_paddle_->rect())) {
+        ball_->BounceOffPaddle(right_paddle_->rect());
+    }
 }
 
 void Game::Render() {

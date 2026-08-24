@@ -10,6 +10,7 @@ public:
     void Render(SDL_Renderer* renderer) const;
 
     void SetVelocity(float velocity_x, float velocity_y);
+    void BounceOffPaddle(const SDL_FRect& paddle_rect);
 
     const SDL_FRect& rect() const { return rect_; }
     float velocity_x() const { return velocity_x_; }
