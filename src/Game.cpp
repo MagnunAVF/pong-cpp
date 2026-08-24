@@ -120,7 +120,7 @@ void Game::ProcessInput() {
 void Game::Update(float dt) {
     left_paddle_->Update(dt, kWindowHeight);
     right_paddle_->Update(dt, kWindowHeight);
-    ball_->Update(dt);
+    ball_->Update(dt, kWindowHeight);
 }
 
 void Game::Render() {

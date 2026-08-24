@@ -6,7 +6,7 @@ class Ball {
 public:
     Ball(float x, float y, float size, float velocity_x, float velocity_y);
 
-    void Update(float dt);
+    void Update(float dt, int window_height);
     void Render(SDL_Renderer* renderer) const;
 
     void SetVelocity(float velocity_x, float velocity_y);
