@@ -11,6 +11,7 @@ public:
 
     void SetVelocity(float velocity_x, float velocity_y);
     void BounceOffPaddle(const SDL_FRect& paddle_rect);
+    void Reset(float x, float y, float speed);
 
     const SDL_FRect& rect() const { return rect_; }
     float velocity_x() const { return velocity_x_; }

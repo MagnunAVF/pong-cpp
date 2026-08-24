@@ -1,6 +1,8 @@
 #include "Game.h"
 
 #include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
 namespace {
 constexpr int kWindowWidth = 800;
@@ -17,6 +19,8 @@ constexpr float kBallSpeed = 250.0f;
 }  // namespace
 
 bool Game::Init() {
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
         return false;
@@ -129,6 +133,21 @@ void Game::Update(float dt) {
                SDL_HasIntersectionF(&ball_->rect(), &right_paddle_->rect())) {
         ball_->BounceOffPaddle(right_paddle_->rect());
     }
+
+    if (ball_->rect().x + ball_->rect().w < 0.0f) {
+        ++right_score_;
+        std::printf("Score: %d - %d\n", left_score_, right_score_);
+        ResetBall();
+    } else if (ball_->rect().x > static_cast<float>(kWindowWidth)) {
+        ++left_score_;
+        std::printf("Score: %d - %d\n", left_score_, right_score_);
+        ResetBall();
+    }
+}
+
+void Game::ResetBall() {
+    ball_->Reset((kWindowWidth - kBallSize) / 2.0f,
+                 (kWindowHeight - kBallSize) / 2.0f, kBallSpeed);
 }
 
 void Game::Render() {

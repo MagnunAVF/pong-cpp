@@ -16,10 +16,14 @@ private:
     void Update(float dt);
     void Render();
 
+    void ResetBall();
+
     SDL_Window* window_ = nullptr;
     SDL_Renderer* renderer_ = nullptr;
     Paddle* left_paddle_ = nullptr;
     Paddle* right_paddle_ = nullptr;
     Ball* ball_ = nullptr;
+    int left_score_ = 0;
+    int right_score_ = 0;
     bool running_ = false;
 };

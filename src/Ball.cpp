@@ -1,7 +1,10 @@
 #include "Ball.h"
 
+#include <cstdlib>
+
 namespace {
 constexpr float kMaxDeflectionSpeed = 200.0f;
+constexpr float kMaxLaunchAngleRatio = 0.5f;
 }  // namespace
 
 Ball::Ball(float x, float y, float size, float velocity_x, float velocity_y)
@@ -47,4 +50,17 @@ void Ball::BounceOffPaddle(const SDL_FRect& paddle_rect) {
     }
 
     velocity_y_ += offset * kMaxDeflectionSpeed;
+}
+
+void Ball::Reset(float x, float y, float speed) {
+    rect_.x = x;
+    rect_.y = y;
+
+    const float direction_x = (std::rand() % 2 == 0) ? 1.0f : -1.0f;
+    const float angle_ratio =
+        (static_cast<float>(std::rand() % 200) / 100.0f - 1.0f) *
+        kMaxLaunchAngleRatio;
+
+    velocity_x_ = direction_x * speed;
+    velocity_y_ = angle_ratio * speed;
 }
