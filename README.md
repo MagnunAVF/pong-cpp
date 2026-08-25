@@ -32,3 +32,31 @@ cmake --build build
 ```sh
 ./build/pong
 ```
+
+## Versioning & releases
+
+The current version lives in the `VERSION` file (plain [semver](https://semver.org/),
+e.g. `0.1.0`) and is baked into the build (CMake project version, window
+title) at configure time.
+
+To bump it:
+
+```sh
+./scripts/bump-version.sh {major|minor|patch}
+```
+
+This updates `VERSION`, commits it, and creates an annotated `vX.Y.Z` git
+tag locally. It refuses to run with a dirty working tree. Push the result
+yourself when ready:
+
+```sh
+git push && git push origin vX.Y.Z
+```
+
+CI (`.github/workflows/release.yml`) builds Linux, macOS, and Windows
+binaries on every pull request into `dev` or `main`:
+
+- PRs into `dev` publish a pre-release build tagged `vX.Y.Z-rc.<run number>`.
+- PRs into `main` publish a full release tagged `vX.Y.Z`, using whatever
+  `VERSION` currently contains — bump it first so the release tag is what
+  you intend.
