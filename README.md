@@ -54,9 +54,10 @@ git push && git push origin vX.Y.Z
 ```
 
 CI (`.github/workflows/release.yml`) builds Linux, macOS, and Windows
-binaries on every pull request into `dev` or `main`:
+binaries whenever code actually lands (merges) on `dev` or `main`:
 
-- PRs into `dev` publish a pre-release build tagged `vX.Y.Z-rc.<run number>`.
-- PRs into `main` publish a full release tagged `vX.Y.Z`, using whatever
-  `VERSION` currently contains — bump it first so the release tag is what
-  you intend.
+- Merging into `dev` publishes a pre-release build tagged
+  `vX.Y.Z-rc.<run number>`.
+- Merging into `main` publishes a full release tagged `vX.Y.Z`, using
+  whatever `VERSION` currently contains — bump it first so the release
+  tag is what you intend.
