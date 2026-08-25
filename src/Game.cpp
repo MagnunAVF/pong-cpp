@@ -157,8 +157,9 @@ bool Game::Init() {
     }
 
     window_ = SDL_CreateWindow(
-        "Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        kWindowWidth, kWindowHeight, SDL_WINDOW_SHOWN);
+        "Pong v" PONG_VERSION_STRING, SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED, kWindowWidth, kWindowHeight,
+        SDL_WINDOW_SHOWN);
     if (window_ == nullptr) {
         std::fprintf(stderr, "SDL_CreateWindow failed: %s\n", SDL_GetError());
         SDL_Quit();
